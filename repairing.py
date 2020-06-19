@@ -19,13 +19,8 @@ import imageio
 
 #数据集
 ##获取所有图片路径
-
-# datasss=glob(os.path.join('./img_align_celeba/','*.jpg'))
-
-
-
-datas=glob(os.path.join('./image_align_celeba_trainset/','*.jpg'))
-datasss=glob(os.path.join('./image_align_celeba_sestset/','*.jpg'))
+datas=glob(os.path.join('./image_align_celeba_trainset/','*.jpg'))#训练集
+datasss=glob(os.path.join('./image_align_celeba_sestset/','*.jpg'))#测试集
 datass=datasss[16:26]
 
 
@@ -38,7 +33,7 @@ beta1 = 0.5 #Adm优化器的衰减率 0.5-0.99
 smooth=0.1
 
 batch_size = 4 #内存不够，128->64->32->16->8->4
-loss_d=[[],[]]
+loss_d=[[],[]]#储存点位信息，用于画图
 loss_g=[[],[]]
 counter = 0 #训练次数
 epoch=400 #迭代次数
@@ -418,15 +413,13 @@ fake_input = tf.random.uniform(shape=([batch_size]+ image_shape),
 fake_part = tf.multiply(fake_input,sample_imask)
 
 
-#周围原图，，中心生成
-
-# 没用上了
-# mask,imask = generate_Mask(batch_size)
 
 
-is_training =False
-training_continue = True #True/False
-dcgan_start = True
+#设置模式
+
+is_training =False#训练模型还是使用模型
+training_continue = True #True/False#是否继续训练
+dcgan_start = True#是否开始调用
 
 
 if is_training  ==True:
@@ -518,17 +511,14 @@ batch_size =1
 # 生成测试噪声输入
 if dcgan_start == True:
     print(tf.train.latest_checkpoint(checkpoint_dird))
-    checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dird))  #从检查带你开始生成人脸
+    checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dird))  #从检查点开始
 
-    num_batch = (int)(len(datass)/batch_size) #  datas== sample_files
+    num_batch = (int)(len(datass)/batch_size)
     print(num_batch)
-    np.random.shuffle(datass)  #  datas== sample_files
+    np.random.shuffle(datass)  
     for i in range((int)(num_batch)):
         
-        checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))  #从检查带你开始生成人脸
-        #生成以batch为单位的随机噪声
-
-        
+        checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))  #从检查点开始生成人脸
 
         print('===================================第{}张图片/{}==================================='.format(i,num_batch))    
         #因为数据过大，采用以batch为单位处理数据集的做法
@@ -557,7 +547,7 @@ if dcgan_start == True:
                 plt.yticks([])
                 plt.imshow(g_model[0].numpy())
        
-                plt.subplot(152)
+                plt.subplot(152)//图片对比矩阵
                 plt.imshow(batch_images[0])
                 plt.xticks([])
                 plt.yticks([])
